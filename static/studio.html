@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Studio · KLSP Interactive Show</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/editor.css">
+</head>
+<body class="studio-body">
+  <header class="bar">
+    <div class="studio-brand">
+      <span class="studio-kicker">KLSP Interactive Show · <span id="appVersion"></span></span>
+      <h1 class="studio-title">Studio</h1>
+    </div>
+    <div class="bar-actions">
+      <a class="btn" href="/camera-check">📷 Camera check</a>
+      <a class="btn" href="/" target="_blank" rel="noopener">Audience home page ↗</a>
+    </div>
+  </header>
+
+  <main class="studio">
+    <section class="studio-section" aria-labelledby="showsHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="showsHeading">Your shows</h2>
+          <p class="help">Changes in the editor save automatically. Use <strong>Save a version</strong> before big changes, so you can always go back.</p>
+        </div>
+        <div class="projects-actions">
+          <button id="newBlankBtn" type="button" class="btn btn-primary">+ New empty show</button>
+          <button id="newSampleBtn" type="button" class="btn">+ New from the example</button>
+          <button id="importBtn" type="button" class="btn">⤒ Upload a show file</button>
+          <input id="importInput" type="file" accept=".zip,application/zip" hidden>
+        </div>
+      </div>
+      <p id="status" class="studio-status" aria-live="polite"></p>
+      <ul id="showList" class="project-list"></ul>
+    </section>
+
+    <section class="studio-section" aria-labelledby="libHeading">
+      <div class="section-head">
+        <div>
+          <h2 id="libHeading">Name library</h2>
+          <p class="help">Names saved here are recognised in every show that asks the children for a name, even when they're misheard. The operator can also save a good name straight from the show with <strong>★ Save to name library</strong>.</p>
+        </div>
+      </div>
+      <div class="lib-add">
+        <label class="visually-hidden" for="libInput">Add names</label>
+        <input id="libInput" type="text" placeholder="Type a name, or several separated by commas, e.g. Bobo, Comel, Sparkle">
+        <button id="libAddBtn" type="button" class="btn btn-primary">Add</button>
+      </div>
+      <div class="lib-tools">
+        <input id="libFilter" type="search" placeholder="Find a name…" aria-label="Find a name">
+        <span id="libCount" class="help"></span>
+        <button id="libClearBtn" type="button" class="btn btn-small btn-danger">Remove all</button>
+      </div>
+      <ul id="libList" class="lib-list" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="/static/js/studio.js"></script>
+</body>
+</html>

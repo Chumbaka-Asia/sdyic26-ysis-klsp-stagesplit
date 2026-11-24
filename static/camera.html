@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Camera check · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/editor.css">
+  <style>
+    .cc { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; align-items: start; }
+    @media (max-width: 950px) { .cc { grid-template-columns: 1fr; } }
+    .cc-cam { position: relative; aspect-ratio: 4 / 3; background: var(--ink); border-radius: 16px; overflow: hidden; }
+    .cc-cam video, .cc-cam canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+    .cc-start { position: absolute; inset: 0; display: grid; place-items: center; }
+    .status-list { list-style: none; margin: 0; padding: 0; }
+    .status-list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .status-list .k { font-weight: 700; }
+    .status-list .v { text-align: right; color: var(--ink-soft); }
+    .v.good { color: var(--t-action); font-weight: 700; }
+    .v.bad { color: var(--warn); font-weight: 700; }
+    .v.warn { color: #8A6400; font-weight: 700; }
+    .tips { background: #FFF6DB; border-radius: 10px; padding: 10px 14px; font-size: 15px; }
+    .tips:empty { display: none; }
+    .tips li { margin: 4px 0; }
+    .sees { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+    .part { font-size: 13px; padding: 2px 10px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); color: var(--ink-soft); }
+    .part.on { background: #E9F5EF; border-color: #BFE3D0; color: #1F6B4B; font-weight: 700; }
+  </style>
+</head>
+<body class="studio-body">
+  <header class="bar">
+    <div class="studio-brand">
+      <span class="studio-kicker">KLSP Interactive Show · <span id="version">…</span></span>
+      <h1 class="studio-title">Camera check</h1>
+    </div>
+    <div class="bar-actions"><a class="btn" href="/studio">← Studio</a></div>
+  </header>
+  <main class="cc">
+    <section>
+      <div class="cc-cam">
+        <video id="v" playsinline muted></video><canvas id="c"></canvas>
+        <div id="startBox" class="cc-start"><button id="startBtn" type="button" class="btn btn-primary">▶ Start the camera</button></div>
+      </div>
+      <p class="help">Stand where the children will stand during the show. The coloured lines show what the camera can see: yellow for the body, blue for hands and fingers, and yellow dots on the forehead, nose, mouth and chin.</p>
+    </section>
+    <aside>
+      <div class="group">
+        <h3>What's working</h3>
+        <ul class="status-list">
+          <li><span class="k">Camera</span><span id="sCam" class="v">not started</span></li>
+          <li><span class="k">Body tracking</span><span id="sBody" class="v">off</span></li>
+          <li><span class="k">Hand tracking</span><span id="sHands" class="v">off</span></li>
+          <li><span class="k">Face tracking</span><span id="sFace" class="v">off</span></li>
+          <li><span class="k">Speed</span><span id="sFps" class="v">–</span></li>
+        </ul>
+        <label class="check-row" style="margin-top:12px"><input id="useHands" type="checkbox" checked> Track hands and fingers</label>
+        <label class="check-row"><input id="useFace" type="checkbox" checked> Track the face</label>
+        <p class="k" style="margin:10px 0 0;font-weight:700">Seen right now</p>
+        <div id="sees" class="sees"></div>
+        <ul id="tips" class="tips"></ul>
+      </div>
+      <div class="group">
+        <h3>Try a move</h3>
+        <label class="field"><span>Move</span><select id="moveSel"></select></label>
+        <div class="field-row tester-opts">
+          <label class="field"><span>Strictness</span><select id="strictSel"><option value="relaxed">Relaxed</option><option value="normal" selected>Normal</option><option value="strict">Strict</option></select></label>
+          <label class="field"><span>Mode</span><select id="modeSel"><option value="single">Single child</option><option value="auditorium">Auditorium</option></select></label>
+        </div>
+        <label class="field" id="maxRow"><span>Children tracked at once (Auditorium)</span>
+          <select id="maxSel"><option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option><option>8</option><option>10</option></select></label>
+        <p id="result" class="tester-result">Start the camera first</p>
+        <div class="progress-bar"><span id="bar"></span></div>
+        <p id="detail" class="help"></p>
+      </div>
+      <div class="group">
+        <h3>Report</h3>
+        <p class="help">If something isn't working, copy this report and send it to whoever helps with the tech.</p>
+        <button id="copyBtn" type="button" class="btn">📋 Copy report</button>
+        <p id="copied" class="help"></p>
+      </div>
+    </aside>
+  </main>
+  <script type="module" src="/static/js/camera.js"></script>
+</body>
+</html>

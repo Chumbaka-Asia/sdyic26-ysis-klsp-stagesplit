@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KLSP Interactive Show</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/show.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="showTitle" class="show-title">KLSP Interactive Show</h1>
+    <div class="status" aria-label="Input status">
+      <span id="micChip" class="chip" data-status="off">Mic <span class="chip-state">Off</span></span>
+      <span id="camChip" class="chip" data-status="off">Camera <span class="chip-state">Off</span></span>
+      <button id="fullscreenBtn" class="btn-quiet" type="button">⛶ Full screen</button>
+      <button id="pauseBtn" class="btn-ctrl" type="button">⏸ Pause</button>
+      <button id="restartTopBtn" class="btn-quiet" type="button">↺ Restart</button>
+      <a id="editTopLink" class="btn-quiet" href="/studio" target="_blank" rel="noopener">✎ Edit story</a>
+      <button id="consoleBtn" class="btn-quiet" type="button" title="Opens the operator console in a second window, like presenter view">🎛 Console</button>
+      <button id="operatorBtn" class="btn-quiet" type="button" aria-expanded="false" aria-controls="operator">⋯ More</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="theatre">
+      <div class="proscenium">
+        <div class="valance" aria-hidden="true"></div>
+        <div id="stage" class="screen">
+          <video id="videoA" playsinline preload="auto"></video>
+          <video id="videoB" playsinline preload="auto"></video>
+          <div id="placeholder" class="placeholder" hidden>
+            <p id="phTitle" class="ph-title"></p>
+            <p id="phLine" class="ph-line"></p>
+            <div id="phTimer" class="ph-timer" aria-hidden="true"><span></span></div>
+            <p id="phFile" class="ph-file"></p>
+          </div>
+          <p id="caption" class="caption" hidden aria-live="polite"></p>
+          <button id="hostSoundBtn" class="stage-sound" type="button" hidden>🔊 Turn sound on</button>
+          <div id="liveMeter" class="live-meter" hidden aria-hidden="true">
+            <p id="lmTitle" class="lm-title"></p>
+            <div id="lmOptions" class="lm-options"></div>
+            <div id="lmPeople" class="lm-people"></div>
+            <div class="lm-row">
+              <div id="lmRing" class="lm-ring"><span id="lmRingLabel"></span></div>
+              <div id="lmWave" class="lm-wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prompt" class="prompt" hidden>
+        <div class="prompt-head">
+          <div>
+            <h2 id="question" class="question"></h2>
+            <p id="hint" class="hint"></p>
+          </div>
+          <div id="countdown" class="countdown" hidden aria-live="off">
+            <span id="countdownNum"></span>
+          </div>
+        </div>
+        <ul id="options" class="options"></ul>
+        <div id="nameCheck" class="name-check" hidden aria-live="polite">
+          <p id="heardNameLabel" class="name-label">I heard</p>
+          <p id="heardName" class="heard-name"></p>
+          <div class="name-actions">
+            <button id="nameUse" type="button" class="btn-ctrl">✓ Use it</button>
+            <button id="nameEdit" type="button" class="btn">✎ Change</button>
+            <button id="nameAgain" type="button" class="btn">↻ Listen again</button>
+            <button id="nameSkip" type="button" class="btn">✕ No name</button>
+            <button id="nameSave" type="button" class="btn">★ Save to name library</button>
+          </div>
+          <p id="nameHint" class="hint"></p>
+        </div>
+        <button id="continueBtn" type="button" class="btn-start btn-continue" hidden>Continue</button>
+        <div id="meter" class="meter" hidden>
+          <div class="meter-ring" aria-hidden="true"></div>
+          <p id="meterLabel" class="meter-label"></p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="senses">
+      <section id="onlinePanel" class="online-panel" aria-label="Online room">
+        <div class="on-head">
+          <p class="side-label">🌐 Online room</p>
+          <p class="on-count"><strong id="onCount">0</strong> here</p>
+        </div>
+        <div class="on-join">
+          <img id="onQr" alt="QR code to watch and join in" width="104" height="104">
+          <div>
+            <p class="room">Room <strong id="onRoom">····</strong></p>
+            <a id="onLink" class="on-link" href="#" target="_blank" rel="noopener"></a>
+            <button id="onCopyBtn" type="button" class="btn-quiet">Copy link</button>
+          </div>
+        </div>
+        <button id="onPublicBtn" type="button" class="btn-quiet on-public">🌐 Make a public link</button>
+        <p id="onPublicNote" class="on-note"></p>
+        <ul id="onGrid" class="on-grid"></ul>
+      </section>
+      <figure class="cam">
+        <video id="cam" playsinline muted></video>
+        <canvas id="poseCanvas"></canvas>
+        <div id="zoneGuide" class="zone-guide" hidden aria-hidden="true"></div>
+        <figcaption>What the camera sees</figcaption>
+      </figure>
+      <div class="heard-box">
+        <p class="side-label">What the microphone hears</p>
+        <p id="heard" class="heard" aria-live="polite">…</p>
+        <div class="level" aria-hidden="true"><span id="micLevel"></span></div>
+      </div>
+      <div class="join">
+        <img id="qrImg" alt="QR code to open the voting page" width="112" height="112">
+        <div>
+          <p class="side-label">Vote on your phone</p>
+          <p class="room">Room <strong id="roomCode">····</strong></p>
+          <p id="voteUrl" class="vote-url"></p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <aside id="operator" class="operator" hidden aria-label="Operator panel">
+    <h2>Operator</h2>
+    <div class="op-row" style="margin-bottom:14px">
+      <a class="btn" href="/" style="text-decoration:none">All stories</a>
+      <a id="editLink" class="btn" href="/studio" target="_blank" rel="noopener" style="text-decoration:none">Edit story</a>
+      <a class="btn" href="/camera-check" target="_blank" rel="noopener" style="text-decoration:none">📷 Camera check</a>
+    </div>
+    <div class="op-row">
+      <button id="restartBtn" type="button" class="btn">Restart…</button>
+      <button id="skipBtn" type="button" class="btn">Skip or time out</button>
+    </div>
+    <label class="op-check"><input id="autoPause" type="checkbox" checked> Pause automatically if this tab is hidden or minimised</label>
+    <label class="op-field">Speech language
+      <select id="langSelect">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="ms-MY">Bahasa Melayu</option>
+        <option value="zh-CN">中文 (普通话)</option>
+      </select>
+    </label>
+    <p class="op-keys">Keys: <kbd>1</kbd>–<kbd>6</kbd> choose an option, <kbd>Enter</kbd> action done, <kbd>Space</kbd> skip or time out, <kbd>P</kbd> pause or resume, <kbd>F</kbd> full screen, <kbd>C</kbd> continue after a break, <kbd>O</kbd> hide this panel.</p>
+    <h3>Log</h3>
+    <ol id="log" class="log"></ol>
+  </aside>
+
+  <div id="startScreen" class="overlay">
+    <div class="overlay-card">
+      <p class="presents">KL Shakespeare Players present</p>
+      <h2 id="startTitle" class="start-title">Loading story…</h2>
+      <label class="check"><input id="useMic" type="checkbox" checked> Use the microphone</label>
+      <p id="micNote" class="note"></p>
+      <label class="check"><input id="useCam" type="checkbox" checked> Use the camera</label>
+      <p class="note">Camera images stay on this computer and are never saved.</p>
+      <label class="check"><input id="goOnline" type="checkbox"> 🌐 Show the online room panel</label>
+      <p class="note">People can always watch and join in on their own devices (for example in a Zoom class). This shows the link, QR code and who's joined. Untick the camera above if everyone is online.</p>
+      <p id="onlineWaiting" class="online-waiting" hidden></p>
+      <p id="startFromNote" class="note"></p>
+      <button id="startBtn" type="button" class="btn-start">Start the show</button>
+      <p><a class="back-link" href="/">← Choose a different story</a></p>
+    </div>
+  </div>
+
+  <div id="pauseScreen" class="overlay overlay-pause" hidden>
+    <div class="overlay-card pause-card" role="dialog" aria-labelledby="pauseHeading">
+      <h2 id="pauseHeading" class="start-title">Paused</h2>
+      <p id="pauseWhere" class="pause-where"></p>
+      <p id="pausedFor" class="note"></p>
+      <p class="note">Everything is on hold, including timers and phone voting.</p>
+      <button id="resumeBtn" type="button" class="btn-start">▶ Resume</button>
+      <p class="note">Or press P</p>
+
+      <div class="pause-section">
+        <h3>Start again</h3>
+        <div class="pause-row">
+          <button id="restartPartBtn" type="button" class="btn">Restart this part</button>
+          <button id="restartAllBtn" type="button" class="btn">Start from the beginning</button>
+        </div>
+      </div>
+      <div class="pause-section">
+        <h3>Leave</h3>
+        <div class="pause-row"><a class="btn" href="/" style="text-decoration:none">Back to all stories</a></div>
+      </div>
+      <div class="pause-section">
+        <h3>Jump to a part</h3>
+        <div class="pause-row">
+          <select id="jumpSelect" aria-label="Part to jump to"></select>
+          <button id="jumpBtn" type="button" class="btn">Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fsBar" class="fs-bar" aria-label="Show controls">
+    <button id="fsPauseBtn" type="button" class="btn-ctrl">⏸ Pause</button>
+    <button id="fsRestartBtn" type="button" class="btn">↺ Restart</button>
+    <button id="fsExitBtn" type="button" class="btn">Exit full screen</button>
+  </div>
+
+  <div id="noProject" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2 class="start-title">Story not found</h2>
+      <p class="note">This story may have been deleted or renamed.</p>
+      <a class="btn-start" href="/">Choose a story</a>
+      <p><button type="button" class="btn" onclick="location.reload()" style="margin-top:14px">Check again</button></p>
+    </div>
+  </div>
+
+  <div id="endScreen" class="overlay" hidden>
+    <div class="overlay-card">
+      <h2 class="start-title">The end</h2>
+      <p class="note">Thank you for watching.</p>
+      <button id="endRestartBtn" type="button" class="btn-start">Watch again</button>
+      <p><a class="btn" href="/" style="display:inline-block;margin-top:16px;text-decoration:none">Choose another story</a></p>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>

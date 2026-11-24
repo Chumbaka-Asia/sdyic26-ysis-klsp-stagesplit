@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story editor · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/editor.css">
+</head>
+<body>
+  <header id="editorBar" class="bar" hidden>
+    <label class="title-field">
+      <span class="visually-hidden">Show title</span>
+      <input id="storyTitle" type="text" placeholder="Name your show">
+    </label>
+    <p id="saveStatus" class="save-status" aria-live="polite">Loading…</p>
+    <div class="bar-actions">
+      <button id="undoBtn" type="button" class="btn" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+      <button id="redoBtn" type="button" class="btn" title="Redo (Ctrl+Y)" disabled>↷ Redo</button>
+      <details class="menu">
+        <summary class="btn">Project ▾</summary>
+        <div class="menu-list">
+          <button id="saveVersionBtn" type="button">★ Save a version now…</button>
+          <button id="versionsBtn" type="button">Earlier versions…</button>
+          <button id="scriptBtn" type="button">📄 Filming script…</button>
+          <button id="exportBtn" type="button">⤓ Download this show</button>
+          <button id="keysBtn" type="button">⌨ Keyboard shortcuts</button>
+          <button id="studioBtn" type="button">← Back to the Studio</button>
+        </div>
+      </details>
+      <a id="playLink" class="btn btn-primary" href="/play" target="_blank" rel="noopener">▶ Play the show</a>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace" hidden>
+    <nav class="map" aria-label="Story map">
+      <div class="map-tabs" role="tablist">
+        <button id="tabStory" role="tab" type="button" aria-selected="true">Story map</button>
+        <button id="tabMoves" role="tab" type="button" aria-selected="false">Moves</button>
+        <button id="tabSettings" role="tab" type="button" aria-selected="false">Settings</button>
+      </div>
+      <div class="map-search">
+        <div id="mapStyle" class="map-style" role="group" aria-label="How to show the story">
+          <button id="styleCanvas" type="button" aria-pressed="true">🗺 Canvas</button>
+          <button id="styleList" type="button" aria-pressed="false">☰ List</button>
+        </div>
+        <input id="search" type="search" placeholder="Find a part…" aria-label="Find a part">
+      </div>
+      <div id="problems" class="problems" hidden></div>
+      <div id="mapBody" class="map-body"></div>
+    </nav>
+    <section id="panel" class="panel" aria-live="polite"></section>
+  </main>
+
+  <dialog id="addDialog" class="dialog">
+    <form method="dialog">
+      <h2 id="addTitle">What happens next?</h2>
+      <p id="addNote" class="help"></p>
+      <div id="typeCards" class="type-cards"></div>
+      <div id="connectRow" class="connect-row">
+        <p>Or join up with a part that already exists:</p>
+        <div class="connect-controls">
+          <select id="connectSelect" aria-label="Existing part"></select>
+          <button id="connectBtn" type="button" class="btn">Join up</button>
+        </div>
+      </div>
+      <div class="dialog-foot"><button class="btn" value="cancel">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="keysDialog" class="dialog">
+    <form method="dialog">
+      <h2>Keyboard shortcuts</h2>
+      <p class="help">On a Mac, use ⌘ Cmd instead of Ctrl. Inside a text box, Ctrl+C, Ctrl+V and Ctrl+Z work on the text as usual.</p>
+      <table class="keys">
+        <tr><th colspan="2">Anywhere</th></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>S</kbd></td><td>Save now (it also saves by itself)</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>Z</kbd></td><td>Undo</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>Y</kbd> or <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></td><td>Redo</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>F</kbd></td><td>Find a part</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>E</kbd></td><td>Open the filming script</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>/</kbd></td><td>Show this list</td></tr>
+        <tr><th colspan="2">The selected part</th></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>C</kbd></td><td>Copy it (paste it in this show or another)</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>X</kbd></td><td>Cut it</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>V</kbd></td><td>Paste a copied part</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>D</kbd></td><td>Make a copy</td></tr>
+        <tr><td><kbd>Delete</kbd></td><td>Delete it (undo with Ctrl+Z)</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>Enter</kbd></td><td>Try the show from here</td></tr>
+        <tr><th colspan="2">Canvas</th></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>+</kbd> / <kbd>Ctrl</kbd> <kbd>−</kbd></td><td>Zoom in / out</td></tr>
+        <tr><td><kbd>Ctrl</kbd> <kbd>0</kbd></td><td>Fit the whole story on screen</td></tr>
+        <tr><td><kbd>Delete</kbd> on a selected wire</td><td>Remove the link</td></tr>
+      </table>
+      <div class="dialog-foot"><button class="btn" value="cancel">Close</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="versionsDialog" class="dialog">
+    <form method="dialog">
+      <h2>Earlier versions</h2>
+      <p class="help">Your story is saved automatically, and a copy is kept every couple of minutes. Versions you saved with a name are marked ★ and are never cleared away. Pick one to bring it back. Your current version is kept too, so you can always change your mind.</p>
+      <ul id="versionsList" class="versions"></ul>
+      <div class="dialog-foot"><button class="btn" value="cancel">Close</button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="/static/js/editor.js"></script>
+</body>
+</html>

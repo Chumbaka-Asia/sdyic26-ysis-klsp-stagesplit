@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Watch the show · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/show.css">
+  <link rel="stylesheet" href="/static/css/watch.css">
+</head>
+<body class="watch-body">
+  <section id="joinScreen" class="w-join">
+    <p class="presents">KL Shakespeare Players</p>
+    <h1>Join the show</h1>
+    <label class="w-field"><span>Room code</span><input id="room" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="1234"></label>
+    <label class="w-field"><span>Your name</span><input id="name" maxlength="20" autocomplete="off" placeholder="A first name or a nickname"></label>
+    <div id="secureWarn" class="w-warn" hidden>
+      <p><strong>🔒 Camera and microphone need a secure link.</strong> This link starts with <code>http://</code>, so your browser won't allow them. You can still watch, vote, type answers and tap “I did it”.</p>
+      <p id="secureHow">Ask the host for the secure link (it starts with <code>https://</code>).</p>
+      <a id="secureBtn" class="btn-ctrl w-secure-btn" href="#" hidden>🔒 Switch to the secure link</a>
+    </div>
+    <label class="w-check"><input id="useCam" type="checkbox" checked> Use my camera for the actions</label>
+    <label class="w-check"><input id="useMic" type="checkbox" checked> Use my microphone for shouting answers</label>
+    <p class="w-privacy">Your camera and microphone stay on this device. Only your answers, and whether you did the action, are shared with the host.</p>
+    <button id="joinBtn" type="button" class="btn-start">Join</button>
+    <p id="joinErr" class="w-err" aria-live="polite"></p>
+  </section>
+
+  <main id="app" class="w-app" hidden>
+    <header class="w-top">
+      <span id="showTitle" class="w-title"></span>
+      <span id="me" class="w-me"></span>
+    </header>
+    <div id="secureBar" class="w-secure-bar" hidden>
+      <span>🔒 Your camera and microphone are off on this link.</span>
+      <a id="secureBtn2" class="btn-ctrl w-secure-btn" href="#">Switch to the secure link</a>
+    </div>
+    <div class="w-stage">
+      <div id="stage" class="screen">
+        <video id="videoA" playsinline preload="auto"></video>
+        <video id="videoB" playsinline preload="auto"></video>
+        <div id="placeholder" class="placeholder" hidden>
+          <p id="phTitle" class="ph-title"></p>
+          <p id="phLine" class="ph-line"></p>
+          <div id="phTimer" class="ph-timer" aria-hidden="true"><span></span></div>
+          <p id="phFile" class="ph-file"></p>
+        </div>
+        <p id="caption" class="caption" hidden aria-live="polite"></p>
+        <div id="waitCover" class="w-cover w-lobby">
+          <div>
+            <p class="w-lobby-kicker">Get ready for</p>
+            <p id="lobbyTitle" class="w-lobby-title">The show</p>
+            <p id="lobbyHi" class="w-lobby-hi">You're in!</p>
+            <p id="lobbyCount" class="w-lobby-count"></p>
+            <p class="w-lobby-wait"><span class="w-dots" aria-hidden="true"><i></i><i></i><i></i></span> Waiting for the host to start the show</p>
+          </div>
+        </div>
+        <div id="pausedCover" class="w-cover" hidden>Paused</div>
+      </div>
+      <button id="soundBtn" type="button" class="w-sound" hidden>🔊 Tap for sound</button>
+      <p id="videoNote" class="w-video-note" hidden></p>
+    </div>
+
+    <section id="checks" class="w-checks">
+      <h2 class="w-question">While you wait: quick checks</h2>
+      <div class="w-check-row">
+        <span class="w-check-icon" id="camIcon">📷</span>
+        <div><p class="w-check-title" id="camTitle">Camera</p><p class="w-status" id="camMsg"></p></div>
+      </div>
+      <div class="w-check-row">
+        <span class="w-check-icon" id="micIcon">🎤</span>
+        <div style="flex:1"><p class="w-check-title" id="micTitle">Microphone</p><p class="w-status" id="micMsg"></p>
+          <div class="w-level" id="micMeter" hidden><span id="micLevel"></span></div></div>
+      </div>
+      <div class="w-check-row">
+        <span class="w-check-icon">🔊</span>
+        <div><p class="w-check-title">Sound</p><p class="w-status" id="soundMsg">Turn your volume up, then press the button.</p>
+          <button id="testSoundBtn" type="button" class="btn-ctrl">Play a test sound</button></div>
+      </div>
+    </section>
+
+    <section class="w-task" aria-live="polite">
+      <h2 id="question" class="w-question"></h2>
+      <p id="hint" class="w-hint"></p>
+
+      <div id="voteBox" class="w-box" hidden>
+        <div id="voteOptions" class="w-options"></div>
+        <div id="emojiRow" class="w-emojis"></div>
+        <p id="voteStatus" class="w-status"></p>
+      </div>
+
+      <div id="moveBox" class="w-box" hidden>
+        <div class="w-move">
+          <div class="w-ring" id="moveRing"><span id="moveRingLabel"></span></div>
+          <div>
+            <p id="moveStatus" class="w-big"></p>
+            <p id="moveDetail" class="w-status"></p>
+            <button id="didItBtn" type="button" class="btn-start w-didit" hidden>✋ I did it!</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="sayBox" class="w-box" hidden>
+        <p class="w-status" id="sayMic"></p>
+        <div class="w-say"><input id="sayInput" maxlength="60" placeholder="Or type your answer"><button id="sayBtn" type="button" class="btn-ctrl">Send</button></div>
+        <p id="sayStatus" class="w-status"></p>
+      </div>
+
+      <div id="cheerBox" class="w-box" hidden>
+        <p id="cheerTitle" class="w-big"></p>
+        <div class="w-level"><span id="cheerLevel"></span></div>
+        <p class="w-status">Cheer as loud as you can!</p>
+      </div>
+
+      <div id="nameBox" class="w-box" hidden><p class="w-status">The show heard:</p><p id="heardName" class="w-name"></p></div>
+      <div id="breakBox" class="w-box" hidden><p id="breakMsg" class="w-big"></p></div>
+      <div id="endBox" class="w-box" hidden><p class="w-big">The end! Thank you for joining in.</p></div>
+
+      <figure id="selfView" class="w-self" hidden>
+        <video id="cam" playsinline muted></video>
+        <canvas id="poseCanvas"></canvas>
+        <div id="zoneGuide" class="zone-guide" hidden></div>
+        <figcaption>You</figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <section id="goneScreen" class="w-join" hidden>
+    <h1 id="goneTitle">You've left the show</h1>
+    <p id="goneMsg" class="w-privacy"></p>
+  </section>
+
+  <script type="module" src="/static/js/watch.js"></script>
+</body>
+</html>

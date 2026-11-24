@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choose a story · KL Shakespeare Players</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/home.css">
+</head>
+<body>
+  <div class="valance" aria-hidden="true"></div>
+  <main class="home">
+    <p class="presents">KL Shakespeare Players present</p>
+    <h1>Choose a story</h1>
+    <p class="lead">Pick one, then help the actors decide what happens next!</p>
+    <ul id="shows" class="shows" aria-live="polite"></ul>
+    <div id="empty" class="empty" hidden>
+      <p class="empty-title">No stories yet</p>
+      <p>The team can add stories in the Studio.</p>
+    </div>
+  </main>
+  <footer class="foot"><a href="/studio">For the team: Studio</a></footer>
+
+  <script>
+    const list = document.getElementById("shows");
+    function card(s) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.className = `story c-${s.color || "velvet"}`;
+      a.href = `/play?show=${encodeURIComponent(s.id)}`;
+      a.innerHTML = `
+        <span class="story-emoji" aria-hidden="true"></span>
+        <span class="story-title"></span>
+        <span class="story-blurb"></span>
+        <span class="story-play" aria-hidden="true">▶ Play</span>`;
+      a.querySelector(".story-emoji").textContent = s.emoji || "🎭";
+      a.querySelector(".story-title").textContent = s.title;
+      a.querySelector(".story-blurb").textContent = s.blurb || "";
+      li.append(a);
+      return li;
+    }
+    fetch("/api/shows").then((r) => r.json()).then((shows) => {
+      list.innerHTML = "";
+      shows.forEach((s) => list.append(card(s)));
+      document.getElementById("empty").hidden = shows.length > 0;
+      const first = list.querySelector("a");
+      if (first) first.focus({ preventScroll: true });
+    }).catch(() => {
+      document.getElementById("empty").hidden = false;
+      document.querySelector(".empty-title").textContent = "Can't reach the show computer";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Words that must never appear on screen as a name, one per line.
+# A built-in list of common rude words (English, Malay, Mandarin) is always used as well.
+# Each show can also add its own words in the editor's Settings tab.

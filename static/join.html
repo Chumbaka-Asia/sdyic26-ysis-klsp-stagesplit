@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join the show · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --night:#1B1633; --dusk:#2A2450; --line:#3D3670; --lime:#F4C542; --mist:#EDEAF7; --dim:#B7B1D6; --warn:#F2998F; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--night); color:var(--mist); font:18px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; display:grid; place-items:center; padding:24px; }
+    main { width:100%; max-width:380px; text-align:center; }
+    h1 { font:700 34px/1.1 "Baloo 2", system-ui, sans-serif; color:var(--lime); margin:0 0 6px; }
+    p { color:var(--dim); margin:0 0 22px; }
+    .digits { display:flex; gap:10px; justify-content:center; margin-bottom:18px; }
+    .digits input { width:64px; height:78px; text-align:center; font:700 40px "Baloo 2", system-ui, sans-serif; background:var(--dusk); color:var(--mist); border:2px solid var(--line); border-radius:14px; }
+    .digits input:focus { outline:none; border-color:var(--lime); }
+    button { width:100%; background:var(--lime); color:var(--night); border:0; border-radius:999px; font:700 22px "Baloo 2", system-ui, sans-serif; padding:12px; cursor:pointer; }
+    .err { color:var(--warn); min-height:1.5em; margin:12px 0 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Join the show</h1>
+    <p>Type the 4-digit room code shown on the big screen.</p>
+    <form id="f" novalidate>
+      <div class="digits">
+        <input inputmode="numeric" maxlength="1" aria-label="Digit 1" autocomplete="off">
+        <input inputmode="numeric" maxlength="1" aria-label="Digit 2" autocomplete="off">
+        <input inputmode="numeric" maxlength="1" aria-label="Digit 3" autocomplete="off">
+        <input inputmode="numeric" maxlength="1" aria-label="Digit 4" autocomplete="off">
+      </div>
+      <button type="submit">Join</button>
+      <p id="err" class="err" aria-live="polite"></p>
+    </form>
+  </main>
+  <script>
+    const boxes = [...document.querySelectorAll(".digits input")];
+    boxes[0].focus();
+    boxes.forEach((b, i) => {
+      b.addEventListener("input", () => {
+        b.value = b.value.replace(/\D/g, "").slice(-1);
+        if (b.value && boxes[i + 1]) boxes[i + 1].focus();
+        if (boxes.every((x) => x.value)) go();
+      });
+      b.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !b.value && boxes[i - 1]) boxes[i - 1].focus(); });
+      b.addEventListener("paste", (e) => {
+        const d = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 4);
+        if (d.length === 4) { e.preventDefault(); d.split("").forEach((c, j) => (boxes[j].value = c)); go(); }
+      });
+    });
+    async function go() {
+      const code = boxes.map((b) => b.value).join("");
+      if (code.length !== 4) return;
+      const r = await fetch(`/api/round?room=${code}`).catch(() => null);
+      if (r && r.ok) location.href = `/vote?room=${code}`;
+      else {
+        document.getElementById("err").textContent = "That code isn't right. Check the big screen and try again.";
+        boxes.forEach((b) => (b.value = ""));
+        boxes[0].focus();
+      }
+    }
+    document.getElementById("f").addEventListener("submit", (e) => { e.preventDefault(); go(); });
+  </script>
+</body>
+</html>

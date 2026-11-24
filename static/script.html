@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filming script · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#1B1633; --soft:#5A5478; --line:#DDD8EE; --paper:#F5F3FB; --velvet:#8E2346; --moss:#2F8A68; --lime:#F4C542; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; }
+    [hidden] { display: none !important; }
+    .tools { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 12px 24px; background: #fff; border-bottom: 1px solid var(--line); }
+    .tools .spacer { flex: 1; }
+    .tools button, .tools label { font: inherit; }
+    .tools button { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 7px 14px; cursor: pointer; }
+    .tools button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .tools .primary { background: var(--velvet); color: #fff; border-color: var(--velvet); font-weight: 700; }
+    .sheet { max-width: 860px; margin: 0 auto; padding: 28px 24px 60px; }
+    h1 { font: 700 34px/1.1 "Baloo 2", system-ui, sans-serif; margin: 0; }
+    .sub { color: var(--soft); margin: 4px 0 26px; }
+    .part { margin: 26px 0 8px; padding-top: 14px; border-top: 3px solid var(--ink); break-after: avoid; }
+    .part h2 { font: 700 22px/1.2 "Baloo 2", system-ui, sans-serif; margin: 0; }
+    .part .path { margin: 2px 0 0; color: var(--soft); font-size: 14px; }
+    .actor { margin: 34px 0 6px; font: 700 26px "Baloo 2", system-ui, sans-serif; border-bottom: 3px solid var(--velvet); }
+    .clip { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; margin: 10px 0; break-inside: avoid; }
+    .clip-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 14px; color: var(--soft); }
+    .clip-head .num { font-weight: 700; color: var(--ink); }
+    .clip-head .role { font-weight: 700; color: var(--ink); }
+    .status { margin-left: auto; font-weight: 700; }
+    .status.done { color: var(--moss); }
+    .status.todo { color: var(--velvet); }
+    .who { margin: 8px 0 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; }
+    .line { margin: 2px 0 0; font-size: 20px; line-height: 1.45; }
+    .line.empty { color: var(--soft); font-style: italic; font-size: 16px; }
+    .onscreen, .note { margin: 6px 0 0; font-size: 14px; color: var(--soft); }
+    .box { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--ink); border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+    @media print {
+      .tools { display: none; }
+      body { background: #fff; }
+      .sheet { padding: 0; max-width: none; }
+      .clip { border-color: #999; }
+    }
+    /* Teleprompter */
+    body.prompter { background: #000; color: #fff; }
+    body.prompter .sheet { display: none; }
+    .tp { display: none; }
+    body.prompter .tp { display: block; }
+    body.prompter .tools { background: #111; border-color: #333; color: #ccc; }
+    body.prompter .tools button { background: #222; color: #eee; border-color: #444; }
+    .tp-inner { max-width: 1100px; margin: 0 auto; padding: 45vh 6vw; font: 700 clamp(34px, 5vw, 64px)/1.35 "Atkinson Hyperlegible", system-ui, sans-serif; }
+    .tp-inner.mirror { transform: scaleX(-1); }
+    .tp-cue { font-size: 0.42em; color: #F4C542; margin: 1.6em 0 0.2em; font-weight: 700; }
+    .tp-line { margin: 0; }
+    .tp-guide { position: fixed; left: 0; right: 0; top: 42vh; height: 0; border-top: 2px solid rgba(244,197,66,0.5); pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="tools">
+    <strong id="toolTitle">Filming script</strong>
+    <span class="spacer"></span>
+    <span>Order:</span>
+    <button id="byScene" type="button" aria-pressed="true">By scene</button>
+    <button id="byActor" type="button" aria-pressed="false">By actor</button>
+    <label><input id="todoOnly" type="checkbox"> Only clips not filmed yet</label>
+    <button id="printBtn" type="button" class="primary">🖨 Print or save as PDF</button>
+    <button id="tpBtn" type="button">📺 Teleprompter</button>
+    <span id="tpTools" hidden>
+      <button id="tpPlay" type="button">▶ Scroll</button>
+      <label>Speed <input id="tpSpeed" type="range" min="10" max="160" value="45"></label>
+      <button id="tpMirror" type="button">Mirror</button>
+    </span>
+  </div>
+  <div class="sheet">
+    <h1 id="title">Loading…</h1>
+    <p id="sub" class="sub"></p>
+    <div id="out"></div>
+  </div>
+  <div class="tp"><div class="tp-guide"></div><div id="tp" class="tp-inner"></div></div>
+  <script type="module" src="/static/js/script.js"></script>
+</body>
+</html>

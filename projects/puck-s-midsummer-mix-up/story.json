@@ -1,0 +1,373 @@
+{
+  "home": {
+    "blurb": "Help Puck find the magic flower, wake the fairy queen and name her donkey!",
+    "color": "violet",
+    "emoji": "🧚",
+    "published": true
+  },
+  "nodes": {
+    "d1": {
+      "default": "forest",
+      "idle": {
+        "duration": 5,
+        "file": "d1_idle.mp4",
+        "line": "Puck: Forest or castle? I can't hear you!",
+        "title": "Puck is waiting..."
+      },
+      "options": [
+        {
+          "emoji": "🌲",
+          "id": "forest",
+          "keywords": [
+            "forest",
+            "trees",
+            "tree",
+            "woods",
+            "wood",
+            "hutan",
+            "森林",
+            "树"
+          ],
+          "label": "The forest",
+          "next": "d1_forest"
+        },
+        {
+          "emoji": "🏰",
+          "id": "castle",
+          "keywords": [
+            "castle",
+            "palace",
+            "king",
+            "duke",
+            "istana",
+            "城堡",
+            "宫殿"
+          ],
+          "label": "The castle",
+          "next": "d1_castle"
+        }
+      ],
+      "prompt": {
+        "duration": 4,
+        "file": "d1_prompt.mp4",
+        "line": "Puck: Should we search the dark forest, or the Duke's castle? Shout it out, or vote on your phone!",
+        "title": "Where should we look?"
+      },
+      "question": "Where should Puck look first?",
+      "timeout_clip": {
+        "duration": 4,
+        "file": "d1_timeout.mp4",
+        "line": "Puck: Nobody chose? Then I pick... the forest!",
+        "title": "Puck decides"
+      },
+      "type": "choice",
+      "ui": {
+        "x": 300,
+        "y": 0
+      },
+      "window_sec": 15
+    },
+    "d1_castle": {
+      "clip": {
+        "duration": 6,
+        "file": "d1_castle.mp4",
+        "line": "The Duke says Titania took the flower into the forest. Off we go! And there she is, fast asleep.",
+        "title": "At the castle"
+      },
+      "next": "d2",
+      "type": "scene",
+      "ui": {
+        "x": 600,
+        "y": 156
+      }
+    },
+    "d1_forest": {
+      "clip": {
+        "duration": 6,
+        "file": "d1_forest.mp4",
+        "line": "Puck tiptoes between the trees and finds Titania, the fairy queen, fast asleep.",
+        "title": "Into the forest"
+      },
+      "next": "d2",
+      "type": "scene",
+      "ui": {
+        "x": 600,
+        "y": 0
+      }
+    },
+    "d2": {
+      "action": "hands_up",
+      "hold_sec": 2,
+      "idle": {
+        "duration": 5,
+        "file": "d2_idle.mp4",
+        "line": "Puck: Higher! Higher! Hold them up!",
+        "title": "Hands up high!"
+      },
+      "prompt": {
+        "duration": 4.3,
+        "file": "WIN_20260926_18_25_21_Pro.mp4",
+        "from_video": true,
+        "line": "Puck: She won't wake up! Everyone, raise your hands up high like the moon!",
+        "title": "Wake the fairy queen"
+      },
+      "question": "Raise your hands high to wake Titania!",
+      "success": "d2_success",
+      "timeout_next": "d2_timeout",
+      "timeout_sec": 20,
+      "type": "action",
+      "ui": {
+        "x": 900,
+        "y": 0
+      }
+    },
+    "d2_success": {
+      "clip": {
+        "duration": 7,
+        "file": "d2_success.mp4",
+        "line": "Titania: Who woke me? Oh, such strong helpers! Here is your flower... but first, my donkey needs a name.",
+        "title": "Titania wakes up"
+      },
+      "next": "d3",
+      "type": "scene",
+      "ui": {
+        "x": 1200,
+        "y": 0
+      }
+    },
+    "d2_timeout": {
+      "clip": {
+        "duration": 7,
+        "file": "d2_timeout.mp4",
+        "line": "Puck blows fairy dust and Titania wakes with a sneeze! She'll give back the flower... if we name her donkey.",
+        "title": "A little help from Puck"
+      },
+      "next": "d3",
+      "type": "scene",
+      "ui": {
+        "x": 1200,
+        "y": 156
+      }
+    },
+    "d3": {
+      "capture": {
+        "expected": [
+          "Bobo",
+          "Comel",
+          "Pickles",
+          "Sparkle",
+          "Kiki",
+          "Nasi Lemak"
+        ],
+        "fallback": "our donkey",
+        "save_as": "donkey name"
+      },
+      "categories": [
+        {
+          "description": "a silly or funny name, food, or made-up word (e.g. Mr Poopy, Nasi Lemak, Bobo)",
+          "id": "funny",
+          "keywords": [
+            "poop",
+            "fart",
+            "silly",
+            "nasi",
+            "lemak",
+            "roti",
+            "banana",
+            "bobo"
+          ],
+          "name": "Silly names",
+          "reaction": {
+            "caption": "Say hello to {donkey name}!",
+            "duration": 5,
+            "file": "d3_funny.mp4",
+            "line": "Titania: Ha! That's the silliest name in all of fairyland. The donkey loves it!",
+            "title": "What a silly name!"
+          }
+        },
+        {
+          "description": "the name of another animal (e.g. Tiger, Kucing, Monkey)",
+          "id": "animal",
+          "keywords": [
+            "tiger",
+            "lion",
+            "cat",
+            "dog",
+            "monkey",
+            "kucing",
+            "harimau",
+            "猫",
+            "狗"
+          ],
+          "name": "Animal names",
+          "reaction": {
+            "caption": "Meet {donkey name} the donkey!",
+            "duration": 5,
+            "file": "d3_animal.mp4",
+            "line": "Titania: A donkey called that? He'll be very confused... but he's giggling!",
+            "title": "A donkey named after an animal?"
+          }
+        },
+        {
+          "description": "a person's name, a real or famous name (e.g. Ali, Sarah, Taylor)",
+          "id": "person",
+          "keywords": [
+            "ali",
+            "sarah",
+            "john",
+            "mary",
+            "adam",
+            "siti"
+          ],
+          "name": "People names",
+          "reaction": {
+            "caption": "Good day, {donkey name}!",
+            "duration": 5,
+            "file": "d3_person.mp4",
+            "line": "Titania: What a fine, proper name. He'll feel like a real gentleman!",
+            "title": "Such a proper name"
+          }
+        }
+      ],
+      "fallback_reaction": {
+        "caption": "Meet {donkey name} the donkey!",
+        "duration": 5,
+        "file": "d3_generic.mp4",
+        "line": "Titania: What a creative name! I've never heard that one before.",
+        "title": "What a creative idea!"
+      },
+      "idle": {
+        "duration": 5,
+        "file": "d3_idle.mp4",
+        "line": "Titania: Any name at all. Be creative!",
+        "title": "Listening for names..."
+      },
+      "listen_sec": 12,
+      "next": "ending",
+      "prompt": {
+        "duration": 5,
+        "file": "d3_prompt.mp4",
+        "line": "Titania: My donkey has no name! What should we call him? Say it out loud!",
+        "title": "Name the donkey"
+      },
+      "question": "What should we name the donkey?",
+      "type": "open",
+      "ui": {
+        "x": 1500,
+        "y": 0
+      }
+    },
+    "ending": {
+      "clip": {
+        "caption": "Goodbye from Puck and {donkey name}!",
+        "duration": 7,
+        "file": "ending.mp4",
+        "line": "Puck: We did it! Thank you, friends. Goodnight, and sweet midsummer dreams!",
+        "title": "The flower is found"
+      },
+      "type": "end",
+      "ui": {
+        "x": 1800,
+        "y": 0
+      }
+    },
+    "intro": {
+      "clip": {
+        "duration": 3,
+        "file": "",
+        "line": "Puck: Hello, friends! I'm Puck, and I've lost the magic flower. Will you help me find it?",
+        "title": "Welcome to the enchanted wood"
+      },
+      "next": "d1",
+      "type": "scene",
+      "ui": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "settings": {
+    "blocked_words": [],
+    "custom_actions": [
+      {
+        "conditions": [
+          {
+            "part": "right_hand",
+            "relation": "near",
+            "target": "head"
+          }
+        ],
+        "id": "move_1",
+        "name": "Touch your head"
+      },
+      {
+        "conditions": [
+          {
+            "part": "right_hand",
+            "relation": "near",
+            "target": "head"
+          }
+        ],
+        "id": "move_2",
+        "name": "New move"
+      },
+      {
+        "calibration": null,
+        "either_hand": true,
+        "examples": [],
+        "id": "move_3",
+        "motion": false,
+        "name": "New move",
+        "negatives": [],
+        "type": "taught",
+        "uses": {
+          "body": true,
+          "face": true,
+          "hands": true
+        },
+        "window_sec": 1.5
+      },
+      {
+        "id": "move_4",
+        "name": "New move",
+        "conditions": [
+          {
+            "part": "right_hand",
+            "relation": "near",
+            "target": "head"
+          }
+        ]
+      },
+      {
+        "id": "move_5",
+        "name": "New move",
+        "type": "taught",
+        "motion": true,
+        "window_sec": 1.5,
+        "either_hand": true,
+        "uses": {
+          "body": true,
+          "hands": true,
+          "face": true
+        },
+        "examples": [],
+        "negatives": [],
+        "calibration": null
+      }
+    ],
+    "default_window_sec": 15,
+    "name_check": "timed",
+    "name_check_sec": 5,
+    "name_listening": "whisper",
+    "speech_lang": "en-US",
+    "weights": {
+      "emoji": 0.1,
+      "poll": 0.5,
+      "voice": 0.4,
+      "cheer": 0.6,
+      "zone": 0.7
+    }
+  },
+  "start": "intro",
+  "title": "Puck's Midsummer Mix-up"
+}

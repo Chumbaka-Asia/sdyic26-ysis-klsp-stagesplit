@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vote · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --night:#1B1633; --dusk:#2A2450; --line:#3D3670; --lime:#F4C542; --moss:#4FAF8A; --mist:#EDEAF7; --dim:#B7B1D6; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--night); color:var(--mist); font:18px/1.5 "Atkinson Hyperlegible", system-ui, sans-serif; padding:24px 18px 40px; }
+    [hidden] { display:none !important; }
+    h1 { font:700 28px/1.15 "Baloo 2", system-ui, sans-serif; margin:0 0 6px; }
+    .sub { color:var(--dim); margin:0 0 22px; }
+    .opts { display:grid; gap:14px; }
+    .opt { display:flex; align-items:center; gap:14px; width:100%; padding:18px; border-radius:16px; border:2px solid transparent; background:var(--dusk); color:var(--mist); font:700 24px "Baloo 2", system-ui, sans-serif; text-align:left; cursor:pointer; }
+    .opt .e { font-size:36px; line-height:1; }
+    .opt[aria-pressed="true"] { border-color:var(--lime); }
+    .opt:focus-visible, .emo:focus-visible { outline:3px solid var(--lime); outline-offset:3px; }
+    .emojis { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+    .emo { font-size:30px; width:58px; height:58px; border-radius:50%; border:0; background:var(--dusk); cursor:pointer; }
+    .emo:active { transform:scale(0.92); }
+    .status { margin-top:22px; color:var(--moss); min-height:1.5em; }
+    .waiting { text-align:center; margin-top:30vh; color:var(--dim); }
+  </style>
+</head>
+<body>
+  <div id="paused" class="waiting" hidden>
+    <h1>Paused</h1>
+    <p>The show will carry on in a moment.</p>
+  </div>
+  <div id="waiting" class="waiting">
+    <h1>Hold tight!</h1>
+    <p>The next question will appear here when the actors ask it.</p>
+  </div>
+  <main id="round" hidden>
+    <h1 id="q"></h1>
+    <p class="sub">Tap your choice. You can change your mind until time runs out.</p>
+    <div id="opts" class="opts"></div>
+    <p class="sub" style="margin:26px 0 0">Send a reaction</p>
+    <div id="emojis" class="emojis"></div>
+    <p id="status" class="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const EXTRA_EMOJIS = ["😂", "😱", "👏", "❤️"];
+    const voterId = localStorage.getItem("klsp-voter") || (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+    try { localStorage.setItem("klsp-voter", voterId); } catch (e) {}
+    let current = { round_id: -1 };
+    const room = new URLSearchParams(location.search).get("room");
+    if (!room) location.replace("/join");
+
+    const post = (path, body) => fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(r => r.json());
+
+    function render(r) {
+      document.getElementById("paused").hidden = !r.paused;
+      document.getElementById("waiting").hidden = r.open || r.paused;
+      document.getElementById("round").hidden = !r.open || r.paused;
+      if (!r.open) return;
+      document.getElementById("q").textContent = r.question;
+      document.getElementById("status").textContent = "";
+      const opts = document.getElementById("opts");
+      opts.innerHTML = "";
+      r.options.forEach(o => {
+        const b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.setAttribute("aria-pressed", "false");
+        b.innerHTML = `<span class="e" aria-hidden="true">${o.emoji || ""}</span><span></span>`;
+        b.lastChild.textContent = o.label;
+        b.onclick = async () => {
+          const res = await post("/api/vote", { round_id: r.round_id, option_id: o.id, voter_id: voterId, room }).catch(() => ({}));
+          if (res.ok) {
+            opts.querySelectorAll(".opt").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+            document.getElementById("status").textContent = `You voted for ${o.label}.`;
+          } else {
+            document.getElementById("status").textContent = res.reason || "Your vote didn't go through. Check you're on the same Wi-Fi.";
+          }
+        };
+        opts.appendChild(b);
+      });
+      const emojis = document.getElementById("emojis");
+      emojis.innerHTML = "";
+      const set = [...new Set([...r.options.map(o => o.emoji).filter(Boolean), ...EXTRA_EMOJIS])];
+      set.forEach(e => {
+        const b = document.createElement("button");
+        b.className = "emo"; b.type = "button"; b.textContent = e; b.setAttribute("aria-label", `Send ${e}`);
+        b.onclick = () => post("/api/emoji", { round_id: r.round_id, emoji: e, room }).catch(() => {});
+        emojis.appendChild(b);
+      });
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch(`/api/round?room=${encodeURIComponent(room)}`, { cache: "no-store" });
+        if (res.status === 403) { location.replace("/join"); return; }  // the show restarted with a new code
+        const r = await res.json();
+        if (r.round_id !== current.round_id || r.open !== current.open) { current = r; render(r); }
+        else if (r.paused !== current.paused) { current.paused = r.paused; document.getElementById("paused").hidden = !r.paused; document.getElementById("round").hidden = !r.open || r.paused; document.getElementById("waiting").hidden = r.open || r.paused; }
+      } catch (e) {}
+      setTimeout(poll, 1000);
+    }
+    poll();
+  </script>
+</body>
+</html>

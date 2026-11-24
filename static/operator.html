@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operator console · KLSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/operator.css">
+</head>
+<body>
+  <header class="op-top">
+    <div>
+      <p class="kicker">Operator console</p>
+      <h1 id="title">Waiting for the show…</h1>
+    </div>
+    <p id="link" class="link-pill" data-state="off">Not connected. Open the show page in this browser.</p>
+  </header>
+
+  <main class="op-grid">
+    <section class="op-main">
+      <div class="card now">
+        <div>
+          <p class="kicker" id="partType">Now</p>
+          <h2 id="partTitle">Nothing playing yet</h2>
+        </div>
+        <div id="countdown" class="count" hidden></div>
+      </div>
+
+      <div class="card">
+        <h3 id="ctxTitle">Controls</h3>
+        <div id="ctx" class="ctx"></div>
+      </div>
+
+      <div class="card">
+        <h3>Show</h3>
+        <div class="row">
+          <button id="pauseBtn" class="big primary" type="button">⏸ Pause <kbd>P</kbd></button>
+          <button id="skipBtn" class="big" type="button">⏭ Skip / end waiting <kbd>Space</kbd></button>
+          <button id="restartPartBtn" class="big" type="button">↺ Restart this part</button>
+          <button id="restartAllBtn" class="big" type="button">⏮ Start again</button>
+        </div>
+        <div class="row jump">
+          <select id="jumpSelect" aria-label="Part to jump to"></select>
+          <button id="jumpBtn" type="button">Jump there</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Log</h3>
+        <ol id="log" class="log"></ol>
+      </div>
+    </section>
+
+    <aside class="op-side">
+      <div class="card">
+        <h3>Camera <span id="people" class="muted"></span></h3>
+        <div class="cam"><img id="camImg" alt="Camera view with body tracking"><p id="camNote" class="muted">Camera off</p></div>
+        <div class="seg" role="group" aria-label="Audience mode">
+          <button id="modeSingle" type="button" aria-pressed="true">Single child</button>
+          <button id="modeAud" type="button" aria-pressed="false">Auditorium</button>
+        </div>
+        <p class="muted small">Auditorium counts across several children and uses overall movement and loudness.</p>
+      </div>
+
+      <div class="card">
+        <h3>Sound</h3>
+        <p class="meter-label">Loudness</p>
+        <div class="bar"><span id="levelBar"></span></div>
+        <p class="meter-label">Room movement</p>
+        <div class="bar"><span id="motionBar"></span></div>
+        <p class="meter-label">Heard</p>
+        <p id="heard" class="heard">…</p>
+        <p id="vars" class="muted small"></p>
+      </div>
+
+      <div class="card">
+        <h3>Phones</h3>
+        <p class="room">Room <strong id="room">····</strong></p>
+        <p id="joinUrl" class="muted small"></p>
+        <img id="qr" class="qr" alt="QR code for phones">
+        <button id="publicBtn" type="button">🌐 Make a public link</button>
+        <p id="publicNote" class="muted small">For phones on mobile data or another Wi-Fi. Only voting is reachable through it.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="/static/js/operator.js"></script>
+</body>
+</html>
